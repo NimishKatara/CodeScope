@@ -1,0 +1,189 @@
+{
+  "metadata": {
+    "project": "CodeScope — Codebase Understanding Agent",
+    "description": "Q&A pairs derived from the sample_repo (auth, api, db modules)",
+    "total": 25,
+    "split": { "train": 18, "val": 4, "test": 3 }
+  },
+  "train": [
+    {
+      "id": "train_01",
+      "question": "Where is authentication handled?",
+      "reference_answer": "Authentication is handled in auth/auth_manager.py by the AuthManager class. It manages login, token generation, and session storage.",
+      "relevant_files": ["auth/auth_manager.py"],
+      "relevant_functions": ["AuthManager", "login", "validate_token"]
+    },
+    {
+      "id": "train_02",
+      "question": "How are passwords hashed?",
+      "reference_answer": "Passwords are hashed using PBKDF2-HMAC with SHA-256 and a random salt in the _hash_password function inside AuthManager.",
+      "relevant_files": ["auth/auth_manager.py"],
+      "relevant_functions": ["_hash_password"]
+    },
+    {
+      "id": "train_03",
+      "question": "What database operations exist?",
+      "reference_answer": "The Database class in db/database.py wraps SQLite and provides CRUD operations for users and records, including get_user_by_username and _init_schema.",
+      "relevant_files": ["db/database.py"],
+      "relevant_functions": ["Database", "get_user_by_username", "_init_schema"]
+    },
+    {
+      "id": "train_04",
+      "question": "How does data flow through the system?",
+      "reference_answer": "Data flows via the DataPipeline class in api/data_pipeline.py: raw payload is ingested, validated, transformed, and then stored using the Database class.",
+      "relevant_files": ["api/data_pipeline.py", "db/database.py"],
+      "relevant_functions": ["DataPipeline", "ingest"]
+    },
+    {
+      "id": "train_05",
+      "question": "How is role-based access enforced?",
+      "reference_answer": "Role-based access is enforced by require_role in AuthManager. It validates the token, retrieves the user's role, and checks it against a role hierarchy (viewer < editor < admin).",
+      "relevant_files": ["auth/auth_manager.py"],
+      "relevant_functions": ["require_role", "validate_token"]
+    },
+    {
+      "id": "train_06",
+      "question": "What API endpoints are defined?",
+      "reference_answer": "api/routes.py defines /api/login (POST), /api/data (GET), and /api/admin/users (GET). Each checks authentication before serving data.",
+      "relevant_files": ["api/routes.py"],
+      "relevant_functions": ["login", "get_data"]
+    },
+    {
+      "id": "train_07",
+      "question": "How are sessions stored?",
+      "reference_answer": "Sessions are stored in an in-memory dictionary _sessions inside AuthManager. Each session maps a token string to a user object and expiry timestamp.",
+      "relevant_files": ["auth/auth_manager.py"],
+      "relevant_functions": ["AuthManager", "login", "validate_token"]
+    },
+    {
+      "id": "train_08",
+      "question": "What schema does the database use?",
+      "reference_answer": "The database schema is initialized in _init_schema and creates two tables: users (id, username, password_hash, salt, role) and records (id, data, created_at).",
+      "relevant_files": ["db/database.py"],
+      "relevant_functions": ["_init_schema"]
+    },
+    {
+      "id": "train_09",
+      "question": "How is token expiry handled?",
+      "reference_answer": "Tokens carry an expires_at timestamp. validate_token in AuthManager checks time.time() against this value and returns None for expired sessions.",
+      "relevant_files": ["auth/auth_manager.py"],
+      "relevant_functions": ["validate_token"]
+    },
+    {
+      "id": "train_10",
+      "question": "What validation does the data pipeline perform?",
+      "reference_answer": "The _validate method in DataPipeline checks that required fields are present in the raw payload and raises a ValueError for missing or malformed data.",
+      "relevant_files": ["api/data_pipeline.py"],
+      "relevant_functions": ["ingest", "_validate"]
+    },
+    {
+      "id": "train_11",
+      "question": "How does the login route work?",
+      "reference_answer": "The /api/login endpoint in routes.py receives a POST with username and password, delegates to AuthManager.login, and returns a token on success or 401 on failure.",
+      "relevant_files": ["api/routes.py", "auth/auth_manager.py"],
+      "relevant_functions": ["login"]
+    },
+    {
+      "id": "train_12",
+      "question": "Where is SQLite used?",
+      "reference_answer": "SQLite is used inside the Database class in db/database.py. The _get_conn method manages connections and _init_schema creates the tables on first use.",
+      "relevant_files": ["db/database.py"],
+      "relevant_functions": ["Database", "_get_conn", "_init_schema"]
+    },
+    {
+      "id": "train_13",
+      "question": "What happens when a user fails to authenticate?",
+      "reference_answer": "If credentials are wrong, AuthManager.login returns None. The route layer in api/routes.py checks for None and returns a 401 Unauthorized JSON response.",
+      "relevant_files": ["auth/auth_manager.py", "api/routes.py"],
+      "relevant_functions": ["login"]
+    },
+    {
+      "id": "train_14",
+      "question": "How are records stored in the database?",
+      "reference_answer": "Records are inserted via the Database class in db/database.py. The DataPipeline calls a store method after transformation, which writes a JSON blob with a UUID into the records table.",
+      "relevant_files": ["db/database.py", "api/data_pipeline.py"],
+      "relevant_functions": ["ingest", "Database"]
+    },
+    {
+      "id": "train_15",
+      "question": "What transformation steps does the pipeline apply?",
+      "reference_answer": "The _run_transforms method in DataPipeline applies normalization and field-mapping steps to the validated payload before handing it off for storage.",
+      "relevant_files": ["api/data_pipeline.py"],
+      "relevant_functions": ["_run_transforms", "ingest"]
+    },
+    {
+      "id": "train_16",
+      "question": "How does the admin endpoint work?",
+      "reference_answer": "The /api/admin/users endpoint in routes.py requires an admin role. It calls require_role with 'admin' and returns all users from the database if authorized.",
+      "relevant_files": ["api/routes.py", "auth/auth_manager.py"],
+      "relevant_functions": ["require_role"]
+    },
+    {
+      "id": "train_17",
+      "question": "What imports are used in the auth module?",
+      "reference_answer": "auth_manager.py imports hashlib for PBKDF2 hashing, time for token expiry, uuid for token generation, and typing for Optional and User type hints.",
+      "relevant_files": ["auth/auth_manager.py"],
+      "relevant_functions": ["AuthManager"]
+    },
+    {
+      "id": "train_18",
+      "question": "How is data retrieved from the pipeline?",
+      "reference_answer": "The DataPipeline's retrieve method queries the Database for records by ID and returns the deserialized JSON payload.",
+      "relevant_files": ["api/data_pipeline.py", "db/database.py"],
+      "relevant_functions": ["DataPipeline"]
+    }
+  ],
+  "val": [
+    {
+      "id": "val_01",
+      "question": "What is the role hierarchy in the system?",
+      "reference_answer": "The role hierarchy is defined in require_role inside AuthManager as viewer=0, editor=1, admin=2. Higher roles have access to all lower-role endpoints.",
+      "relevant_files": ["auth/auth_manager.py"],
+      "relevant_functions": ["require_role"]
+    },
+    {
+      "id": "val_02",
+      "question": "How is a new user created?",
+      "reference_answer": "User creation is handled by the Database class in db/database.py. A salt is generated, the password is hashed via _hash_password, and the record is inserted into the users table.",
+      "relevant_files": ["db/database.py", "auth/auth_manager.py"],
+      "relevant_functions": ["_hash_password", "_init_schema"]
+    },
+    {
+      "id": "val_03",
+      "question": "What is the structure of the DataPipeline class?",
+      "reference_answer": "DataPipeline in api/data_pipeline.py has four main steps: ingest (entry point), _validate (field checks), _run_transforms (normalization), and store (delegates to Database).",
+      "relevant_files": ["api/data_pipeline.py"],
+      "relevant_functions": ["DataPipeline", "ingest"]
+    },
+    {
+      "id": "val_04",
+      "question": "How does the system prevent unauthorized data access?",
+      "reference_answer": "The /api/data route in routes.py extracts the Bearer token from the Authorization header and calls require_role with 'viewer' before returning any data.",
+      "relevant_files": ["api/routes.py", "auth/auth_manager.py"],
+      "relevant_functions": ["get_data", "require_role", "validate_token"]
+    }
+  ],
+  "test": [
+    {
+      "id": "test_01",
+      "question": "Where is authentication handled?",
+      "reference_answer": "Authentication is handled in auth/auth_manager.py by the AuthManager class, which exposes login, validate_token, and require_role methods.",
+      "relevant_files": ["auth/auth_manager.py"],
+      "relevant_functions": ["AuthManager", "login", "validate_token"]
+    },
+    {
+      "id": "test_02",
+      "question": "How are passwords hashed?",
+      "reference_answer": "Passwords are hashed with PBKDF2-HMAC-SHA256 and a per-user random salt inside _hash_password in AuthManager.",
+      "relevant_files": ["auth/auth_manager.py"],
+      "relevant_functions": ["_hash_password"]
+    },
+    {
+      "id": "test_03",
+      "question": "What database operations exist?",
+      "reference_answer": "The Database class in db/database.py provides get_user_by_username, insert operations for users and records, and schema initialization via _init_schema.",
+      "relevant_files": ["db/database.py"],
+      "relevant_functions": ["Database", "get_user_by_username", "_init_schema"]
+    }
+  ]
+}
